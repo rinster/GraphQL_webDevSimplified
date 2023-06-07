@@ -3,7 +3,8 @@ const expressGraphQL = require('express-graphql').graphqlHTTP;
 const {
     GraphQLSchema,
     GraphQLObjectType,
-    GraphQLString
+    GraphQLString,
+    GraphQLList
 } = require('graphql')
 const app = express();
 
@@ -33,6 +34,19 @@ const schema = new GraphQLSchema({
                  resolve: () => 'Hello World' 
             }
         })
+    })
+})
+
+// Root Query  - Allows us to query from different types of data 
+const RootQuery = new GraphQLObjectType({
+    name: 'Query',
+    description: 'Root Query',
+    fields: () => ({
+        books: {
+            type: new GraphQLList(BookType),
+            description: 'List of All Books',
+            resolve: () => books
+        }
     })
 })
 
