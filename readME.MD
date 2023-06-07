@@ -86,3 +86,16 @@ app.listen(3000, () => {console.log('Server running')});
 `http://localhost:3000/graphql`
 
 3. Voila! This should open up a browser tab to handle your GraphSchema with **GraphiQL** interface
+
+---
+
+#### GraphQL Query Syntax
+Query all book names 
+```
+{
+  books {
+    name
+    id
+  }
+}
+```
