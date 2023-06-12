@@ -178,6 +178,29 @@ app.use('/graphql', expressGraphQL({
 app.listen(3000, () => {console.log('Server running')});
 ```
 
+### Query Only Authors?
+
+You'll need to add authors to the root query like so
+```
+// Root Query  - Allows us to query from different types of data 
+const RootQueryType = new GraphQLObjectType({
+    name: 'Query',
+    description: 'Root Query',
+    fields: () => ({
+        books: {
+            type: new GraphQLList(BookType),
+            description: 'List of All Books',
+            resolve: () => books
+        },
+        authors: {
+            type: new GraphQLList(AuthorType),
+            description: 'List of All Authors',
+            resolve: () => authors
+        }
+    })
+})
+```
+
 ---
 
 ## GraphQL Query Syntax
@@ -249,4 +272,35 @@ Will return
     ]
   }
 }
+```
+
+### Querying only author data 
+Ensure that you have added authors to the root query
+
+```
+{
+    authors {
+      name
+    }
+}
+
+```
+Returns this
+```
+{
+  "data": {
+    "authors": [
+      {
+        "name": "J. K. Rowling"
+      },
+      {
+        "name": "J. R. R. Tolkien"
+      },
+      {
+        "name": "Brent Weeks"
+      }
+    ]
+  }
+}
+
 ```
