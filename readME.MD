@@ -123,7 +123,7 @@ const books = [
 ]
 ```
 
-Define your books, authors and root query query
+Define your books, authors and root query 
 ```
 // Define the BookType Query
 const BookType = new GraphQLObjectType({
@@ -230,6 +230,41 @@ const RootQueryType = new GraphQLObjectType({
     })
 })
 ```
+## A Note on fields
+Return a function that returns an object VS. Returning an object
+```
+// FUNCTION to object
+fields: () => ({
+        id: { type: GraphQLNonNull(GraphQLInt) },
+       ...
+       author: {
+            type: AuthorType,
+            resolve: (book) => {
+                return authors.find(author => author.id === book.authorId)
+            }
+        }
+})
+
+// FUNCTION ONLY
+fields: {
+        id: { type: GraphQLNonNull(GraphQLInt) },
+        ...
+        author: {
+            type: AuthorType,
+            resolve: (book) => {
+                return authors.find(author => author.id === book.authorId)
+            }
+      }
+}
+```
+The reason we want to return a function that returns an object is because we want to be able to access the GraphQL types if they're defined later on in the code. For example, `author` type might be defined later on in the code like so: 
+```
+  authors: {
+            type: new GraphQLList(AuthorType),
+            ...
+  }
+```
+By using the `function to return an object`, we're tricking the parser to have a reference to that wrapped type anywhere in in code, EVEN before it is defined. If we use the `fields to only return object`, we will receive errors.
 
 ---
 
@@ -356,6 +391,28 @@ Returns this
 
 ```
 ### Query a single book by ID
+Update your root query to have a new field
+```
+...
+  fields: () => ({
+        book: {
+            type: BookType,
+            description: 'A Single Book',
+            args: {
+                id: { type: GraphQLInt }
+            },
+            resolve: (parent, args) => books.find(book => book.id === args.id)
+        },
+        books: {
+            type: new GraphQLList(BookType),
+            description: 'List of All Books',
+            resolve: () => books
+        },
+     ...
+    });
+  
+```
+In GraphiQL, run this script 
 ```
 {
  book(id: 1) {
@@ -364,7 +421,7 @@ Returns this
 }
 
 ```
-will return this:
+it will return this:
 ```
 {
   "data": {
