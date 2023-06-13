@@ -180,7 +180,7 @@ app.use('/graphql', expressGraphQL({
 app.listen(3000, () => {console.log('Server running')});
 ```
 
-### Query Only Authors?
+### How to Query Only Authors
 
 You'll need to add authors to the root query like so
 ```
@@ -189,6 +189,34 @@ const RootQueryType = new GraphQLObjectType({
     name: 'Query',
     description: 'Root Query',
     fields: () => ({
+        books: {
+            type: new GraphQLList(BookType),
+            description: 'List of All Books',
+            resolve: () => books
+        },
+        authors: {
+            type: new GraphQLList(AuthorType),
+            description: 'List of All Authors',
+            resolve: () => authors
+        }
+    })
+})
+```
+### How to Query a Single Book
+Update your root query for a single book
+```
+const RootQueryType = new GraphQLObjectType({
+    name: 'Query',
+    description: 'Root Query',
+    fields: () => ({
+        book: {
+            type: BookType,
+            description: 'A Single Book',
+            args: {
+                id: { type: GraphQLInt }
+            },
+            resolve: (parent, args) => books.find(book => book.id === args.id)
+        },
         books: {
             type: new GraphQLList(BookType),
             description: 'List of All Books',
@@ -326,4 +354,23 @@ Returns this
   }
 }
 
+```
+### Query a single book by ID
+```
+{
+ book(id: 1) {
+		name
+	} 
+}
+
+```
+will return this:
+```
+{
+  "data": {
+    "book": {
+      "name": "Harry Potter and the Chamber of Secrets"
+    }
+  }
+}
 ```
