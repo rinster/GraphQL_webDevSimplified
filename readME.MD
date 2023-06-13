@@ -165,7 +165,9 @@ const RootQueryType = new GraphQLObjectType({
         }
     })
 })
-
+```
+Rewrite your base schema to receive your root query, place this near the bottom of the file
+```
 const schema = new GraphQLSchema({
     query: RootQueryType
 })
