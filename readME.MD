@@ -264,7 +264,62 @@ The reason we want to return a function that returns an object is because we wan
             ...
   }
 ```
-By using the `function to return an object`, we're tricking the parser to have a reference to that wrapped type anywhere in in code, EVEN before it is defined. If we use the `fields to only return object`, we will receive errors.
+By using the `function to return an object`, we're tricking the parser to have a reference to that wrapped type anywhere in code, EVEN before it is defined. If we use the `fields to only return object`, we will receive errors.
+
+---
+## Root Mutation
+**TLDR;**
+In short, it's the GET POST PUT and DELETE version to change data in the database, effectively 'mutating' the data so to speak.
+
+In GraphQL, mutation is a type of operation that allows you to modify data on the server-side. It is analogous to the CRUD (Create, Read, Update, Delete) operations in traditional database systems. Mutations are used when you want to perform actions that result in a change in the data stored on the server.
+
+Mutations in GraphQL are defined in the schema, just like queries. They specify the input arguments required for the mutation and the expected return type. The key difference between queries and mutations is that mutations can cause side effects on the server, such as modifying data, while queries are meant for fetching data without modifying it.
+
+Here's an example of a simple mutation in GraphQL:
+```
+mutation {
+  addAuthor(name: "New Author") {
+    id
+    name
+  }
+}
+
+```
+**To create your Root Mutation, add an `Root Mutation` object like so:**
+In the below mutation, there is an `addBook` and `addAuthor`
+```
+const RootMutationType = new GraphQLObjectType({
+    name: 'Mutation',
+    description: 'Root Mutation',
+    fields: () => ({
+        addBook: {
+            type: BookType,
+            description: 'Add a Book',
+            args: {
+                name: {type: GraphQLNonNull(GraphQLString)},
+                authorId: {type: GraphQLNonNull(GraphQLInt)},
+                resolve: (parent, args) => {
+                    const book = {id: books.length + 1, name: args.name, authorId: args.authorId}
+                    books.push(book) // add new book to arr of books
+                    return book
+                }
+            }
+        },
+        addAuthor: {
+            type: AuthorType,
+            description: 'Add an Author',
+            args: {
+                name: { type: GraphQLNonNull(GraphQLString) },
+                resolve: (parent, args) => {
+                    const author = { id: books.length + 1, name: args.name }
+                    authors.push(author) // add new book to arr of books
+                    return author
+                }
+            }
+        },
+    })
+})
+```
 
 ---
 
