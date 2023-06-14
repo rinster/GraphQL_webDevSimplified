@@ -1,15 +1,13 @@
 # Tutorial [Learn GraphQL in 40 Minutes](https://www.youtube.com/watch?v=ZQL7tL2S0oQ&ab_channel=WebDevSimplified)  :link:
 
 **Author: WebDevSimplified**
-
-
-GraphQL is the hottest technology when it comes to server side APIs for good reason. It is incredibly fast to develop with, and it makes building a front-end painlessly easy. In this video I am going to be teaching you what GraphQL is, why it is important, why it is better than REST, and then we will be walking through an entire Node.js and Express GraphQL API for books and authors. By the end of this video you will have a complete understanding of what GraphQL is and how to use it.
+GraphQL is the hottest technology when it comes to server side APIs for good reason. It is incredibly fast to develop with, and it makes building a front-end painlessly easy. In this video I am going to be teaching you what GraphQL is, why it is important, why it is better than REST, and then we will be walking through an entire Node.js and Express GraphQL API for books and authors. By the end of this video [Learn GraphQL in 40 Minutes](https://www.youtube.com/watch?v=ZQL7tL2S0oQ&ab_channel=WebDevSimplified) you will have a complete understanding of what GraphQL is and how to use it.
 
 **What is GraphQL?**
 
 GraphQL is a query language and runtime that makes it easier to work with APIs (Application Programming Interfaces). Let's break it down into simpler terms.
 
-Imagine you have a web application that needs to get data from a server. Traditionally, you would use REST APIs, where you have specific endpoints for different types of data. For example, if you wanted to get information about a user, you might have an endpoint like /users/:id.
+Imagine you have a web application that needs to get data from a server. Traditionally, you would use REST APIs, where you have specific endpoints for different types of data. For example, if you wanted to get information about a user, you might have an endpoint like `/users/:id`.
 
 Now, GraphQL takes a different approach. Instead of having multiple endpoints, you have a single endpoint called the GraphQL server. This server understands your requests and gives you the data you need.
 
@@ -182,7 +180,7 @@ app.listen(3000, () => {console.log('Server running')});
 
 ### How to Query Only Authors
 
-You'll need to add authors to the root query like so
+You'll need to add `authors` to the root query like so
 ```
 // Root Query  - Allows us to query from different types of data 
 const RootQueryType = new GraphQLObjectType({
@@ -231,9 +229,10 @@ const RootQueryType = new GraphQLObjectType({
 })
 ```
 ## A Note on fields
-Return a function that returns an object VS. Returning an object
+Return a function that returns an object `vs` Returning an object
+
+##### :white_check_mark: GOOD PRACTICE - Function to Object
 ```
-// FUNCTION to object
 fields: () => ({
         id: { type: GraphQLNonNull(GraphQLInt) },
        ...
@@ -244,8 +243,10 @@ fields: () => ({
             }
         }
 })
+```
 
-// FUNCTION ONLY
+##### :x: BAD PRACTICE - Object Only
+```
 fields: {
         id: { type: GraphQLNonNull(GraphQLInt) },
         ...
@@ -257,11 +258,11 @@ fields: {
       }
 }
 ```
-The reason we want to return a function that returns an object is because we want to be able to access the GraphQL types if they're defined later on in the code. For example, `author` type might be defined later on in the code like so: 
+The reason we want to return a function that returns an object is because we want the parser to be able to access the GraphQL types if they're defined later on in the code. For example, `author` type might be defined later on in the code like so: 
 ```
   authors: {
-            type: new GraphQLList(AuthorType),
-            ...
+      type: new GraphQLList(AuthorType),
+      ...
   }
 ```
 By using the `function to return an object`, we're tricking the parser to have a reference to that wrapped type anywhere in code, EVEN before it is defined. If we use the `fields to only return object`, we will receive errors.
@@ -298,23 +299,23 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 name: {type: GraphQLNonNull(GraphQLString)},
                 authorId: {type: GraphQLNonNull(GraphQLInt)},
-                resolve: (parent, args) => {
-                    const book = {id: books.length + 1, name: args.name, authorId: args.authorId}
-                    books.push(book) // add new book to arr of books
-                    return book
-                }
-            }
+            },
+            resolve: (parent, args) => {
+                const book = {id: books.length + 1, name: args.name, authorId: args.authorId}
+                books.push(book) // add new book to arr of books
+                return book
+            }       
         },
         addAuthor: {
             type: AuthorType,
             description: 'Add an Author',
             args: {
                 name: { type: GraphQLNonNull(GraphQLString) },
-                resolve: (parent, args) => {
-                    const author = { id: books.length + 1, name: args.name }
-                    authors.push(author) // add new book to arr of books
-                    return author
-                }
+            },
+            resolve: (parent, args) => {
+                const author = { id: authors.length + 1, name: args.name }
+                authors.push(author) // add new book to arr of books
+                return author
             }
         },
     })
@@ -395,7 +396,7 @@ Will return
 ```
 
 ### Querying only author data 
-Ensure that you have added authors to the root query
+Ensure that you have added `authors` to the root query
 
 ```
 const RootQueryType = new GraphQLObjectType({
@@ -416,7 +417,7 @@ const RootQueryType = new GraphQLObjectType({
 })
 ```
 
-So this:
+So this query in GraphQL:
 
 ```
 {
@@ -446,7 +447,7 @@ Returns this
 
 ```
 ### Query a single book by ID
-Update your root query to have a new field
+Update your root query to have a new field `book` like so:
 ```
 ...
   fields: () => ({
@@ -471,8 +472,8 @@ In GraphiQL, run this script
 ```
 {
  book(id: 1) {
-		name
-	} 
+    name
+  } 
 }
 
 ```
